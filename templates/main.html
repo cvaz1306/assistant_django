@@ -132,7 +132,7 @@
         const chatMessages = document.getElementById("chat-messages");
         const userInput = document.getElementById("user-input");
         const sendButton = document.getElementById("send-button");
-        var d;
+        var dat;
 
         function messageServer() {
             const url = '/main/mess'; // Replace with your server URL
@@ -156,7 +156,7 @@
                 .then(data => {
                     // Handle the response data here
                     console.log('Response:', data);
-                    d = data;
+                    dat = data;
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the request
