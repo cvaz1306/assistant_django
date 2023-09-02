@@ -13,7 +13,8 @@ def mess(request):
         message_text = request.POST.get('message', None)
         if message_text:
             # Create a new message object and save it to the database
-            message = models.message.objects.create(message=message_text)
+            message = models.message(message=message_text)
+            message.save()
 
     # Retrieve all messages from the database and prepare them for JSON response
     all_messages = [message.message for message in models.message.objects.all()]
