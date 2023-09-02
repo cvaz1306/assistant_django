@@ -3,6 +3,7 @@ from django.shortcuts import render
 from . import texpprocessing
 from . import models
 from django.views.decorators.csrf import csrf_exempt
+import json
 # Create your views here.
 
 def main(request):
@@ -11,7 +12,7 @@ def main(request):
 def mess(request):
     print(f"Request method: {request.method}")
     #if request.method == "GET":
-    message_text = request.POST.get("message")
+    message_text = json.dumps(request.POST, indent=4)#).get('message','No message Available')
     print(f"Creating db entry: {message_text}")
     # Create a new message object and save it to the database
     message = models.message.objects.create(message=message_text)
