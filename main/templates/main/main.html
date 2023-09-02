@@ -129,25 +129,42 @@
     </div>
 
     <script>
-        function addMessage() {
-            const chatMessage = document.createElement("div");
-            chatMessage.className = "chat-message";
-            chatMessage.textContent = messageText;
+        const chatMessages = document.getElementById("chat-messages");
+        const userInput = document.getElementById("user-input");
+        const sendButton = document.getElementById("send-button");
+        var dat;
 
-            // Append the message to the chat-messages container
-            chatMessages.appendChild(chatMessage);
+        function messageServer() {
+            const url = '/main/mess'; // Replace with your server URL
 
-            // Clear the input field
-            userInput.value = "";
+            // Define the JSON data you want to send
+            const jsonData = {
+                'message': userInput.value.trim()
+            };
 
-            // Scroll to the bottom of the chat-messages container
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            fetch()
+            // Create the request options
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData), // Stringify the JSON data
+            };
+
+            fetch(url, requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data here
+                    console.log('Response:', data);
+                    dat = data;
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the request
+                    console.error('Error:', error);
+                });
         }
         document.addEventListener("DOMContentLoaded", function() {
-            const chatMessages = document.getElementById("chat-messages");
-            const userInput = document.getElementById("user-input");
-            const sendButton = document.getElementById("send-button");
+
 
             sendButton.addEventListener("click", function() {
                 const messageText = userInput.value.trim();
