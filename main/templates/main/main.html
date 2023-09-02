@@ -170,6 +170,7 @@
                 const messageText = userInput.value.trim();
 
                 if (messageText !== "") {
+                    messageServer();
                     // Create a new chat message element
                     const chatMessage = document.createElement("div");
                     chatMessage.className = "chat-message";
@@ -183,7 +184,7 @@
 
                     // Scroll to the bottom of the chat-messages container
                     chatMessages.scrollTop = chatMessages.scrollHeight;
-                    messageServer();
+
                 }
             });
 
