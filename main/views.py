@@ -13,4 +13,4 @@ def mess(request):
         if(request.POST.get('message',None) is not None):
             message=request.POST.get('message',None)
             message=models.message(message=request.POST.get('message',None))
-    return JsonResponse({message.message for message in models.message.objects.all()})
+    return JsonResponse({message.message for message in models.message.objects.all()}, safe=False)
