@@ -132,9 +132,10 @@
         const chatMessages = document.getElementById("chat-messages");
         const userInput = document.getElementById("user-input");
         const sendButton = document.getElementById("send-button");
+        var d;
 
         function messageServer() {
-            const url = 'https://example.com/api/endpoint'; // Replace with your server URL
+            const url = '/main/mess'; // Replace with your server URL
 
             // Define the JSON data you want to send
             const jsonData = {
@@ -155,6 +156,7 @@
                 .then(data => {
                     // Handle the response data here
                     console.log('Response:', data);
+                    d = data;
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the request
