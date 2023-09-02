@@ -129,10 +129,40 @@
     </div>
 
     <script>
+        const chatMessages = document.getElementById("chat-messages");
+        const userInput = document.getElementById("user-input");
+        const sendButton = document.getElementById("send-button");
+
+        function messageServer() {
+            const url = 'https://example.com/api/endpoint'; // Replace with your server URL
+
+            // Define the JSON data you want to send
+            const jsonData = {
+                'message': userInput.value.trim()
+            };
+
+            // Create the request options
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData), // Stringify the JSON data
+            };
+
+            fetch(url, requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data here
+                    console.log('Response:', data);
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the request
+                    console.error('Error:', error);
+                });
+        }
         document.addEventListener("DOMContentLoaded", function() {
-            const chatMessages = document.getElementById("chat-messages");
-            const userInput = document.getElementById("user-input");
-            const sendButton = document.getElementById("send-button");
+
 
             sendButton.addEventListener("click", function() {
                 const messageText = userInput.value.trim();
