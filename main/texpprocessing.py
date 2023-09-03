@@ -59,7 +59,7 @@ def solve_equation(equation_str):
 def answer_question(document, question):
     qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased", framework="pt")
     answer = qa_pipeline(question=question, context=document)
-    return answer["answer"] #if answer["score"] > 0.5 else "Answer not available."
+    return answer["answer"] if answer["score"] > 0.5 else "Answer not available."
 
     # Initialize a variable to store the user's commands
 def process(fff, input):
