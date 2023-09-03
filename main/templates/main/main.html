@@ -62,12 +62,21 @@
         }
         /* Chatbot messages styles */
         
-        .chat-message {
+        .user-message {
             background-color: #fff;
             color: #009bff;
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
+        }
+        
+        .server-message {
+            background-color: #fff;
+            color: #009bff;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: right;
         }
         /* Text input and submit button styles */
         
@@ -118,8 +127,15 @@
 
     <!-- Chatbot container -->
     <div class="chatbot-container">
-        <div class="chat-messages" id="chat-messages">
+        <div class="user-messages" id="chat-messages">
             <!-- Existing and dynamically added chat messages will go here -->
+            {% for message in messages %} {% if message.isServer %}
+            <div class="server-message">{{ message.message }}</div>
+
+            {% else %}
+            <div class="user-message">{{ message.message }}</div>
+            {% endif %} {% endfor %}
+
         </div>
         <!-- Text input and submit button -->
         <div class="message-input-container">
@@ -173,7 +189,7 @@
                     messageServer();
                     // Create a new chat message element
                     const chatMessage = document.createElement("div");
-                    chatMessage.className = "chat-message";
+                    chatMessage.className = "user-message";
                     chatMessage.textContent = messageText;
 
                     // Append the message to the chat-messages container
