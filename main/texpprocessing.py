@@ -46,125 +46,80 @@ def summarize_text(text, num_sentences=3):
     
     # Combine the selected sentences into a single string
     summary = " ".join(str(sentence) for sentence in summary_sentences)
-    
     return summary
-
-    # Text Processing
 def extract_keywords(text):
     doc = intResp.nlp(text)
-    keywords = [token.text for token in doc if not token.is_stop and token.is_alpha]
+    keywords = [f"<code class=\"code\">{token.text}</code>" for token in doc if not token.is_stop and token.is_alpha]
     return keywords
-
-# Math Assistance
 def solve_equation(equation_str):
-    equation = sympify(equation_str)  # Convert string to SymPy expression
-    solution = solve(equation, x)
+    print(equation_str)
+    print(eval("5+5")==eval(equation_str))
+    solution=eval(equation_str)
     return solution
-
-# Question Answering
 def answer_question(document, question):
     qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased", framework="pt")
+    print(f"Document: {document}\n\nQuestion: {question}")
+    
     answer = qa_pipeline(question=question, context=document)
     return answer["answer"] if answer["score"] > 0.5 else "Answer not available."
 
     # Initialize a variable to store the user's commands
-
-    
 def process(fff, input):
+    resp=""
+    print(f"Ins Completed: {intResp.inputsCompleted}; ")
     if(intResp.inputsCompleted==0):
         intResp.user_commands.append(input)
-        actionX=""
-        actionX+="exit" if input.lower() == "exit" else ""
-        actionX+="keywords" if input.lower() == "keywords" else ""
-        actionX+="summarize" if input.lower() == "summarize" else ""
-        actionX+="solve" if input.lower() == "solve" else ""
-        actionX+="question" if input.lower() == "question" else ""
-        actionX+="invalid" if actionX.lower() =="" else ""
-        intResp.inputsRequired=intResp.actionIns.get(actionX)
-        return intResp.resps.get(actionX)[intResp.inputsCompleted]
-    if(intResp.inputsCompleted < intResp.inputsRequired and not intResp.user_commands==0):
+        intResp.actionX="exit" if input.lower() == "exit" else ""+"keywords" if input.lower() == "keywords" else ""+"summarize" if input.lower() == "summarize" else ""+"solve" if input.lower() == "solve" else ""+"question" if input.lower() == "question" else ""+"invalid" if intResp.actionX.lower() =="" else ""
+        print(f"Action X: '{intResp.actionX}'")
+        intResp.inputsRequired=intResp.actionIns.get(intResp.actionX)
+        resp = intResp.resps.get(intResp.actionX)[intResp.inputsCompleted]
+    if(intResp.inputsCompleted <= intResp.inputsRequired and not intResp.user_commands==0):
         intResp.user_commands.append(input)
-        return intResp.resps.get(actionX)[intResp.inputsCompleted]
+        print(f"Input: {input.lower()}; ActionX: {intResp.actionX}; Inputs completed: {intResp.inputsCompleted}")
+        if(not intResp.inputsCompleted==intResp.inputsRequired):
+            resp = intResp.resps.get(intResp.actionX)[intResp.inputsCompleted]
         
     intResp.inputsCompleted=intResp.inputsCompleted+1
-    if(intResp.inputsCompleted==intResp.inputsRequired):
+    
+    if(intResp.inputsCompleted>intResp.inputsRequired):
         output=gr(inpArr=intResp.user_commands)
         intResp.inputsRequired=0
         intResp.inputsCompleted=0
-        return output
+        resp = output
+        intResp.user_commands.clear()
+    return resp
 def gr(inpArr):
     if inpArr[0].lower() == "exit":
         return "Goodbye! Have a great day."
         
     elif "keywords" in inpArr[0].lower():
-        text = inpArr[1]
+        text = inpArr[2]
         keywords = extract_keywords(text)
         return f"The keywords in the text are: {', '.join(keywords)}"
         
     elif "summarize" in inpArr[0].lower():
         intResp.action="summarize"
-        text = inpArr[1]
+        text = inpArr[2]
+        print(f"Summarizing: {text}")
         summary = summarize_text(text)
         return f"Here's a brief summary: {summary}"
         
     elif "solve" in inpArr[0].lower():
         intResp.action="solve"
-        equation_str = inpArr[1]
+        print(f"InpArr: {inpArr[1]}")
+        equation_str = inpArr[2]
         solution = solve_equation(equation_str)
         return f"The solution to the equation is: {solution}"
         
     elif "question" in inpArr[0].lower():
         intResp.action="question"
-        document = inpArr[1]
-        question = inpArr[2]
+        document = inpArr[2]
+        question = inpArr[3]
         answer = answer_question(document, question)
+        print(f"answer: {answer}")
         return f"The answer to your question is: {answer}"
         
     else:
         return "I'm sorry. I can't understand your request."
         
 
-def generate_response(user_input):
-    if(action == ""):
-        if user_input.lower() == "exit":
-            return "Goodbye! Have a great day."
-            
-        elif "keywords" in user_input.lower():
-            action="keywords"
-            text = input("Enter the text: ")
-            keywords = extract_keywords(text)
-            return f"The keywords in the text are: {', '.join(keywords)}"
-            
-        elif "summarize" in user_input.lower():
-            action="summarize"
-            text = input("Enter the text: ")
-            summary = summarize_text(text)
-            return f"Here's a brief summary: {summary}"
-            
-        elif "solve" in user_input.lower():
-            action="solve"
-            equation_str = input("Enter the equation (in terms of x): ")
-            variable = input("Enter the variable: ")
-            solution = solve_equation(equation_str, variable)
-            return f"The solution to the equation is: {solution}"
-            
-        elif "question" in user_input.lower():
-            action="question"
-            document = input("Enter the document: ")
-            question = input("Ask your question: ")
-            answer = answer_question(document, question)
-            return f"The answer to your question is: {answer}"
-            
-        else:
-            return "I'm sorry. I can't understand your request."
-    else:
-        if(action=="keywords"):
-            action=""
-        if(action=="keywords"):
-            action=""
-        if(action=="keywords"):
-            action=""
-        if(action=="keywords"):
-            action=""
-        if(action=="keywords"):
-            action=""
