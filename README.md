@@ -5,4 +5,5 @@ There is no security built in to this project
 ##Create Python Virtual Environment
 Run ```py -m venv <venv name>```.
 Then run ```<venv name>/Scripts/activate```.
+Then ```cd assistant_django``` to move into the cloned directory.
 Then ```pip install -r requirements.txt``` to install required packages.
