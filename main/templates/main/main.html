@@ -39,6 +39,11 @@
             padding: 20px 0;
         }
         
+        .user-messages {
+            overflow: scroll;
+            height: 801px;
+        }
+        
         .nav-link {
             display: block;
             padding: 15px;
@@ -173,11 +178,27 @@
                     // Handle the response data here
                     console.log('Response:', data);
                     dat = data;
+                    addMessage(data.response, 'server')
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the request
                     console.error('Error:', error);
                 });
+        }
+
+        function addMessage(message, uos) {
+            const chatMessage = document.createElement("div");
+            chatMessage.className = uos + "-message";
+            chatMessage.textContent = message;
+
+            // Append the message to the chat-messages container
+            chatMessages.appendChild(chatMessage);
+
+            // Clear the input field
+            userInput.value = "";
+
+            // Scroll to the bottom of the chat-messages container
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -188,18 +209,7 @@
                 if (messageText !== "") {
                     messageServer();
                     // Create a new chat message element
-                    const chatMessage = document.createElement("div");
-                    chatMessage.className = "user-message";
-                    chatMessage.textContent = messageText;
-
-                    // Append the message to the chat-messages container
-                    chatMessages.appendChild(chatMessage);
-
-                    // Clear the input field
-                    userInput.value = "";
-
-                    // Scroll to the bottom of the chat-messages container
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    addMessage(messageText, 'user')
 
                 }
             });

@@ -20,7 +20,7 @@ def mess(request):
         message = models.message(message=postData.get('message',None))
         message.save()
         print(f"Created Message: {message.message}")
-        response=process("fff",input="question")#postData.get('message')
+        response=process("fff",input=postData.get('message',None))
         serverResponse=models.message(message=response, isServer=True)
         serverResponse.save()
         all_messages = {'messages':
