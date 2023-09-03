@@ -5,8 +5,9 @@ There is no security built in to this project
 ## Create Python Virtual Environment
 Run ```py -m venv <venv name>```.
 Then run ```<venv name>/Scripts/activate```.
-Run ```cd Assistant``` to open the project directory
+Run ```mkdir Assistant``` and then ```cd Assistant``` to open the project directory
 Clone the repository. ```git clone https://github.com/cvaz1306/assistant_django.git```
+Run ```cd assistant_django```
 Then ```pip install -r requirements.txt``` to install required packages.
 Run ```py -m django startproject Assistant```.
 
