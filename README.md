@@ -10,6 +10,7 @@ Clone the repository. ```git clone https://github.com/cvaz1306/assistant_django.
 Run ```cd assistant_django```
 Then ```pip install -r requirements.txt``` to install required packages.
 Run ```cd ..```
+Delete ```Assistant``` folder by running ```rm Assistant```.
 Run ```py -m django startproject Assistant```.
 
 Then ```cd assistant_django``` to move into the cloned directory.
