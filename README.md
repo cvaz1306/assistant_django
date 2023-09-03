@@ -9,6 +9,7 @@ Run ```mkdir Assistant``` and then ```cd Assistant``` to open the project direct
 Clone the repository. ```git clone https://github.com/cvaz1306/assistant_django.git```
 Run ```cd assistant_django```
 Then ```pip install -r requirements.txt``` to install required packages.
+Run ```cd ..```
 Run ```py -m django startproject Assistant```.
 
 Then ```cd assistant_django``` to move into the cloned directory.
