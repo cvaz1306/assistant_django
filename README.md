@@ -14,4 +14,4 @@ Delete ```Assistant``` folder by running ```rm Assistant```.
 Run ```py -m django startproject Assistant```.
 
 Then ```cd assistant_django``` to move into the cloned directory.
-To run the development server, run ```py manage.py runserver <optional:ip address:port>```
+To run the development server, run ```py manage.py runserver <optional:ip address:port>```, for instance ```py manage.py runserver 127.0.0.1:8080```
