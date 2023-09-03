@@ -49,7 +49,7 @@ def summarize_text(text, num_sentences=3):
     return summary
 def extract_keywords(text):
     doc = intResp.nlp(text)
-    keywords = [token.text for token in doc if not token.is_stop and token.is_alpha]
+    keywords = [f"<code class=\"code\">{token.text}</code>" for token in doc if not token.is_stop and token.is_alpha]
     return keywords
 def solve_equation(equation_str):
     print(equation_str)
@@ -58,6 +58,8 @@ def solve_equation(equation_str):
     return solution
 def answer_question(document, question):
     qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased", framework="pt")
+    print(f"Document: {document}\n\nQuestion: {question}")
+    
     answer = qa_pipeline(question=question, context=document)
     return answer["answer"] if answer["score"] > 0.5 else "Answer not available."
 
@@ -84,32 +86,35 @@ def process(fff, input):
         intResp.inputsRequired=0
         intResp.inputsCompleted=0
         resp = output
+        intResp.user_commands.clear()
     return resp
 def gr(inpArr):
     if inpArr[0].lower() == "exit":
         return "Goodbye! Have a great day."
         
     elif "keywords" in inpArr[0].lower():
-        text = inpArr[1]
+        text = inpArr[2]
         keywords = extract_keywords(text)
         return f"The keywords in the text are: {', '.join(keywords)}"
         
     elif "summarize" in inpArr[0].lower():
         intResp.action="summarize"
-        text = inpArr[1]
+        text = inpArr[2]
+        print(f"Summarizing: {text}")
         summary = summarize_text(text)
         return f"Here's a brief summary: {summary}"
         
     elif "solve" in inpArr[0].lower():
         intResp.action="solve"
-        equation_str = inpArr[1]
+        print(f"InpArr: {inpArr[1]}")
+        equation_str = inpArr[2]
         solution = solve_equation(equation_str)
         return f"The solution to the equation is: {solution}"
         
     elif "question" in inpArr[0].lower():
         intResp.action="question"
-        document = inpArr[1]
-        question = inpArr[2]
+        document = inpArr[2]
+        question = inpArr[3]
         answer = answer_question(document, question)
         print(f"answer: {answer}")
         return f"The answer to your question is: {answer}"

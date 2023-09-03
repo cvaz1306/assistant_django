@@ -115,6 +115,16 @@
             left: -56px;
         }
         
+        .code {
+            background-color: #ccc;
+            border-radius: 4px;
+            padding: 3px;
+            margin-left: 5px;
+            margin-right: 0px;
+            margin-bottom: 9px;
+            margin-top: 23px;
+        }
+        
         .submit-button:hover {
             background-color: #0056b3;
         }
@@ -189,7 +199,7 @@
         function addMessage(message, uos) {
             const chatMessage = document.createElement("div");
             chatMessage.className = uos + "-message";
-            chatMessage.textContent = message;
+            chatMessage.innerHTML = message;
 
             // Append the message to the chat-messages container
             chatMessages.appendChild(chatMessage);
