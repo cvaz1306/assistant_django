@@ -5,7 +5,7 @@ import base64
 import io
 from django.http import HttpResponse, JsonResponse
 import matplotlib.pyplot as plt
-import urllib.parse  # Import urllib.parse instead of urllib3
+import urllib.parse
 from django.views.decorators.csrf import csrf_exempt
 import numpy as np
 from . import models

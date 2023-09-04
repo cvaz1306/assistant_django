@@ -4,4 +4,3 @@ urlpatterns = [
     path('main/',views.main),
     path('mess',views.mess)
 ]
-#Main

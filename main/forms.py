@@ -1,6 +1,6 @@
 from django import forms
 from .models import *
-#Unnecessary
+#Unnecessary.
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadedFile

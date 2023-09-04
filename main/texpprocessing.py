@@ -12,7 +12,6 @@ from collections import Counter
 from urllib.parse import quote
 from numpy import *
 import json
-#Imports
 class intResp():
     # Load spaCy model
     user_commands = []

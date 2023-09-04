@@ -23,4 +23,3 @@ urlpatterns = [
     path("main/",include("main.urls")),
     path('filemanager/', include("filemanager.urls")),
 ]
-#Parent

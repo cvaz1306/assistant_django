@@ -6,4 +6,3 @@ urlpatterns=[
     path('files', views.files),
     path('get', views.getFile)
 ]
-#XXXX
