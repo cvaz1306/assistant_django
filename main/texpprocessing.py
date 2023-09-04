@@ -1,5 +1,4 @@
 import base64
-from email import base64mime
 import io
 from matplotlib import pyplot as plt
 import numpy as np
@@ -78,8 +77,7 @@ def process(fff, input):
     print(f"Ins Completed: {intResp.inputsCompleted}; ")
     if(intResp.inputsCompleted==0):
         intResp.user_commands.append(input)
-        # intResp.actionX="exit" if input.lower() == "exit" else ""+"keywords" if input.lower() == "keywords" else ""+"summarize" if input.lower() == "summarize" else ""+"solve" if input.lower() == "solve" else ""+"question" if input.lower() == "question" else ""+"invalid" if intResp.actionX.lower() =="" else ""
-        input_lower = input.lower()  # Convert input to lowercase for case-insensitive comparisons
+        input_lower = input.lower()  
         if input_lower == "exit":
             intResp.actionX = "exit"
         elif input_lower == "keywords":
