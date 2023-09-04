@@ -11,7 +11,7 @@ Clone the repository. ```git clone https://github.com/cvaz1306/assistant_django.
 ## Install required Python packages
 Run ```cd assistant_django```
 Then ```pip install -r requirements.txt``` to install required packages.
-# Create new Django project
+## Create new Django project
 Run ```cd ..```
 Delete ```Assistant``` folder by running ```rm Assistant```.
 Run ```py -m django startproject Assistant```.
