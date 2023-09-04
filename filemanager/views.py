@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 import numpy as np
 from . import models
 from .forms import *
+from ..main.forms import UploadFileForm
 # In your Django view, use the `HttpResponse()` function to return the image file to the user
 @csrf_exempt
 def filemanager(request):
