@@ -57,7 +57,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-                '/Users/kx838/Docs/assistant/assistant_django/main/templates'
+                BASE_DIR / '/main/templates'
             ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -123,7 +123,7 @@ STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    "/Users/kx838/Docs/assistant/assistant_django/static",
+    BASE_DIR / "static",
 ]
 
 # Default primary key field type
