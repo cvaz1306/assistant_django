@@ -65,6 +65,7 @@
             margin: 10px 0;
             margin-right: 1004px;
             min-height: 46px;
+            overflow: hidden;
         }
         
         .server-message {
@@ -76,6 +77,7 @@
             text-align: right;
             margin-left: 1004px;
             min-height: 46px;
+            overflow: hidden;
         }
         /* Text input and submit button styles */
         
@@ -125,5 +127,6 @@
         
         .graph {
             position: relative;
-            left: -55px;
+            left: -207px;
+            scale: .65;
         }

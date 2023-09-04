@@ -9,6 +9,7 @@ import urllib3
 from .models import *
 from collections import Counter
 from urllib.parse import quote
+from numpy import *
 class intResp():
     # Load spaCy model
     user_commands = []
@@ -143,7 +144,7 @@ def gr(inpArr):
         equation_str = inpArr[2]
         
         try:
-            x = np.linspace(-2, 2, 100)
+            x = np.linspace(-20, 20, 1000)
             y = eval(equation_str.replace('y=', ''))
             
             # Create a figure and axes
@@ -159,7 +160,7 @@ def gr(inpArr):
             string = base64.b64encode(buf.read()).decode()  # Decode the base64 bytes to a string
             
             uri = 'data:image/png;base64,' + quote(string)  # Use urllib.parse.quote to encode the string
-            html = f'<img class=\"graph\" src="{uri}"/>'
+            html = f'<img class=\"graph\" src=\"{uri}\"/>'
             return html
         except Exception as e:
             return f"Error: {e}"
