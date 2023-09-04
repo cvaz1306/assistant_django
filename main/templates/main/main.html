@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="/static/css/main.css">
 
 
 </head>
@@ -14,9 +14,9 @@
 <body>
     <div class="navbar">
         <h1>Chatbot</h1>
-        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="/">Home</a>
         <a class="nav-link" href="/filemanager">Files</a>
-        <a class="nav-link" href="#">Contact</a>
+        <a class="nav-link" href="/contact">Contact</a>
     </div>
 
     <!-- Chatbot container -->
@@ -38,80 +38,7 @@
         </div>
     </div>
 
-    <script>
-        const chatMessages = document.getElementById("chat-messages");
-        const userInput = document.getElementById("user-input");
-        const sendButton = document.getElementById("send-button");
-        var dat;
-
-        function messageServer() {
-            const url = '/main/mess'; // Replace with your server URL
-
-            // Define the JSON data you want to send
-            const jsonData = {
-                'message': userInput.value.trim()
-            };
-
-            // Create the request options
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(jsonData), // Stringify the JSON data
-            };
-
-            fetch(url, requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response data here
-                    console.log('Response:', data);
-                    dat = data;
-                    addMessage(data.response, 'server')
-                })
-                .catch(error => {
-                    // Handle any errors that occurred during the request
-                    console.error('Error:', error);
-                });
-        }
-
-        function addMessage(message, uos) {
-            const chatMessage = document.createElement("div");
-            chatMessage.className = uos + "-message";
-            chatMessage.innerHTML = message;
-
-            // Append the message to the chat-messages container
-            chatMessages.appendChild(chatMessage);
-
-            // Clear the input field
-            userInput.value = "";
-
-            // Scroll to the bottom of the chat-messages container
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-
-
-            sendButton.addEventListener("click", function() {
-                const messageText = userInput.value.trim();
-
-                if (messageText !== "") {
-                    messageServer();
-                    // Create a new chat message element
-                    addMessage(messageText, 'user')
-
-                }
-            });
-
-            // Function to handle pressing the Enter key
-            userInput.addEventListener("keydown", function(event) {
-                if (event.key === "Enter") {
-                    event.preventDefault(); // Prevents a newline in the input field
-                    sendButton.click(); // Trigger a click on the send button
-                }
-            });
-        });
-    </script>
+    <script type="text/javascript" src="/static/js/main.js"></script>
 </body>
 
 </html>

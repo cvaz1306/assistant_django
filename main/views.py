@@ -4,7 +4,8 @@ from .texpprocessing import *
 from . import models
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+def contact(request):
+    return render(request, "main/contact.html")
 def main(request):
     
     return render(template_name='main/main.html', request=request, context={'messages':models.message.objects.all()})
