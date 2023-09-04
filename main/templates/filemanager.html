@@ -7,7 +7,9 @@
     <title>File Manager</title>
     <!-- Include Font Awesome CSS (you should link to the actual Font Awesome CSS file) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/filemanager.css">
     <link rel="stylesheet" href="/static/main.css">
+
     <style>
         /* Add CSS styles here for the file manager layout */
         
@@ -53,7 +55,6 @@
 </head>
 
 <body>
-    <!-- Navbar -->
     <div class="navbar">
         <h1>File Manager</h1>
         <a class="nav-link" href="#">Home</a>
@@ -62,7 +63,7 @@
     </div>
 
     <!-- File manager container -->
-    <div class="file-manager-container">
+    <div class="file-manager-container grid-list" id="files">
         <!-- List of uploaded files goes here -->
     </div>
 
@@ -73,13 +74,60 @@
 
     <!-- Hidden file input element -->
     <form id="fileX" method="post" action="/filemanager/upload" enctype="multipart/form-data">
+        {% csrf_token %}
         <input type="file" id="file-input" accept="*" style="display: none;" name="file">
+        <button type="submit" style="display: none;" id="sub"></button>
     </form>
 
     <script>
+        const fileList = document.getElementById("files");
+        // Create a function to generate a rounded square card
+        function createRoundedSquareCard(link, title, text) {
+            const card = document.createElement("a");
+            card.href = link;
+            card.classList.add("card");
+
+            const cardContent = document.createElement("div");
+            cardContent.classList.add("card-content");
+
+            const heading = document.createElement("h2");
+            heading.textContent = title;
+
+            const paragraph = document.createElement("p");
+            paragraph.textContent = text;
+
+            cardContent.appendChild(heading);
+            cardContent.appendChild(paragraph);
+
+            card.appendChild(cardContent);
+
+            return card;
+        }
+
+        // Append the card to the container
+
+
+        var d;
+
+        function updateFiles() {
+            fetch('/filemanager/files').then(response => response.json()).then(data => {
+                console.log(data);
+                d = data;
+                const fx = document.createElement('div');
+
+                data.forEach(item => {
+
+                    const card = createRoundedSquareCard("/filemanager/get?id=" + item.id.toString(), item.name.slice(0, 8) + "...", "Download");
+                    fx.appendChild(card);
+                });
+                fileList.innerHTML = fx.innerHTML;
+                fx.innerHTML = "";
+            })
+        }
         let e = false;
         const form = document.getElementById("fileX");
         document.addEventListener('submit', (e) => {
+            e.preventDefault();
             // Store reference to form to make later code easier to read
             const form = e.target;
 
@@ -90,7 +138,7 @@
             });
 
             // Prevent the default form submit
-            e.preventDefault();
+
         });
         // Trigger file input click when the plus button is clicked
         const uploadButton = document.querySelector('.upload-button');
@@ -107,6 +155,7 @@
             console.log("Clicked button")
             fileInput.click();
             e = false;
+            updateFiles();
         });
 
         // Prevent Enter key from triggering file input click
@@ -123,10 +172,13 @@
             if (selectedFile) {
                 // Handle the selected file, e.g., upload it to the server
                 console.log(`Selected file: ${selectedFile.name}`);
-                form.submit();
+                document.getElementById("sub").click();
             }
+            updateFiles();
         });
         document.addEventListener('submit', (e) => {
+            e.preventDefault();
+            console.log("Sending");
             // Store reference to form to make later code easier to read
             const form = e.target;
 
@@ -137,7 +189,7 @@
             });
 
             // Prevent the default form submit
-            e.preventDefault();
+            updateFiles();
         });
     </script>
 

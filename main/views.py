@@ -16,7 +16,6 @@ def mess(request):
     print(f"Request method: {request.method}")
     print(str(request.body))
     if request.method == "POST":
-        # Create a new message object and save it to the database
         message = models.message(message=postData.get('message',None))
         message.save()
         print(f"Created Message: {message.message}")

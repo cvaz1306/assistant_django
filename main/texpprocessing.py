@@ -12,6 +12,7 @@ from collections import Counter
 from urllib.parse import quote
 from numpy import *
 import json
+#Imports
 class intResp():
     # Load spaCy model
     user_commands = []
@@ -73,8 +74,6 @@ def answer_question(document, question):
     
     answer = qa_pipeline(question=question, context=document)
     return answer["answer"] if answer["score"] > 0.5 else "Answer not available."
-
-    # Initialize a variable to store the user's commands
 def process(fff, input):
     
     resp=""
