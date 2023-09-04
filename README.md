@@ -5,9 +5,7 @@ There is no security built in to this project. This means that if this project i
 ## Create and Activate Python Virtual Environment
 Run ```py -m venv <venv name>```.
 Then run ```<venv name>/Scripts/activate```.
-## Clone the Github Repo
 ## Install required Python packages
-Run ```cd assistant_django```
 Then ```pip install django``` to install django.
 ## Create new Django project
 Run ```py -m django startproject Assistant```.
