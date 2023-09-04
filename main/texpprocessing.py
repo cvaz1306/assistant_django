@@ -160,7 +160,7 @@ def gr(inpArr):
             string = base64.b64encode(buf.read()).decode()  # Decode the base64 bytes to a string
             
             uri = 'data:image/png;base64,' + quote(string)  # Use urllib.parse.quote to encode the string
-            html = f'<img class=\"graph\" src=\"{uri}\"/>'
+            html = f'<img class=\"graph\" src=\"{uri}\" />'
             return html
         except Exception as e:
             return f"Error: {e}"
