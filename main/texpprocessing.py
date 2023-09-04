@@ -3,13 +3,15 @@ import io
 from matplotlib import pyplot as plt
 import numpy as np
 import spacy
-from sympy import symbols, Eq, solve, sympify
+from sympy import Symbol, symbols, Eq, solve, sympify
+import sympy
 from transformers import pipeline
 import urllib3
 from .models import *
 from collections import Counter
 from urllib.parse import quote
 from numpy import *
+import json
 class intResp():
     # Load spaCy model
     user_commands = []
@@ -74,6 +76,7 @@ def answer_question(document, question):
 
     # Initialize a variable to store the user's commands
 def process(fff, input):
+    
     resp=""
     print(f"Ins Completed: {intResp.inputsCompleted}; ")
     if(intResp.inputsCompleted==0):
@@ -142,10 +145,14 @@ def gr(inpArr):
         intResp.action = "graph"
         print(f"InpArr: {inpArr[2]}")
         equation_str = inpArr[2]
+        sympy_eq = sympify("Eq(" + equation_str.replace("=", ",") + ")")
+        solution=list(solve(sympy_eq))[0]
         
+        sx=str(list(sympy.solve(sympy_eq, sympy.Symbol('y')))[0])
+        print(f"Solution: {sx}")
         try:
             x = np.linspace(-20, 20, 1000)
-            y = eval(equation_str.replace('y=', ''))
+            y = eval(f'{sx}')
             
             # Create a figure and axes
             fig, ax = plt.subplots(figsize=(10, 5))
@@ -174,7 +181,9 @@ def gr(inpArr):
         return f"The answer to your question is: {answer}"
     
     else:
-        return "I'm sorry. I can't understand your request."
+        print(json.dumps(inpArr))
         intResp.inputsCompleted=0
+        return "I'm sorry. I can't understand your request."
+        
         
 

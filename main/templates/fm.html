@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% block content %}
+<h2>Delete File</h2>
+
+<p>Are you sure you want to delete '{{ file.name }}'?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+</form>
+
+<p><a href="{% url 'file_manager' %}">Cancel</a></p>
+{% endblock %}

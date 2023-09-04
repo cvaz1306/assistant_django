@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager</title>
+    <!-- Include Font Awesome CSS (you should link to the actual Font Awesome CSS file) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/main.css">
+    <style>
+        /* Add CSS styles here for the file manager layout */
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        
+        .navbar h1 {
+            margin: 0;
+            padding: 0;
+        }
+        /* Add more styles as needed for your file manager interface */
+        /* Circular button at the bottom right */
+        
+        .upload-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 24px;
+            line-height: 50px;
+            cursor: pointer;
+        }
+        /* Hide the default file input */
+        
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>File Manager</h1>
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="/filemanager">Files</a>
+        <a class="nav-link" href="#">Contact</a>
+    </div>
+
+    <!-- File manager container -->
+    <div class="file-manager-container">
+        <!-- List of uploaded files goes here -->
+    </div>
+
+    <!-- Circular button for file upload -->
+    <label class="upload-button" for="file-input">
+        <i class="fas fa-plus"></i>
+    </label>
+
+    <!-- Hidden file input element -->
+    <form id="fileX" method="post" action="/filemanager/upload" enctype="multipart/form-data">
+        <input type="file" id="file-input" accept="*" style="display: none;" name="file">
+    </form>
+
+    <script>
+        let e = false;
+        const form = document.getElementById("fileX");
+        document.addEventListener('submit', (e) => {
+            // Store reference to form to make later code easier to read
+            const form = e.target;
+
+            // Post data using the Fetch API
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+            });
+
+            // Prevent the default form submit
+            e.preventDefault();
+        });
+        // Trigger file input click when the plus button is clicked
+        const uploadButton = document.querySelector('.upload-button');
+        const fileInput = document.getElementById('file-input');
+        fileInput.addEventListener('click', (event) => {
+            if (!e) {
+                event.preventDefault()
+            }
+            console.log("Clicked")
+
+        })
+        uploadButton.addEventListener('click', () => {
+            e = true;
+            console.log("Clicked button")
+            fileInput.click();
+            e = false;
+        });
+
+        // Prevent Enter key from triggering file input click
+        uploadButton.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+            }
+        });
+
+        // Handle file selection (you can add further logic here)
+        fileInput.addEventListener('change', () => {
+            // You can access selected file(s) via fileInput.files
+            const selectedFile = fileInput.files[0];
+            if (selectedFile) {
+                // Handle the selected file, e.g., upload it to the server
+                console.log(`Selected file: ${selectedFile.name}`);
+                form.submit();
+            }
+        });
+        document.addEventListener('submit', (e) => {
+            // Store reference to form to make later code easier to read
+            const form = e.target;
+
+            // Post data using the Fetch API
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+            });
+
+            // Prevent the default form submit
+            e.preventDefault();
+        });
+    </script>
+
+</body>
+
+</html>
