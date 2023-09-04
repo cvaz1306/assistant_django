@@ -1,8 +1,15 @@
+import base64
+from email import base64mime
+import io
+from matplotlib import pyplot as plt
+import numpy as np
 import spacy
 from sympy import symbols, Eq, solve, sympify
 from transformers import pipeline
+import urllib3
 from .models import *
 from collections import Counter
+from urllib.parse import quote
 class intResp():
     # Load spaCy model
     user_commands = []
@@ -14,7 +21,8 @@ class intResp():
         "summarize":1,
         "solve":1,
         "question":2,
-        "invalid":0
+        "invalid":0,
+        "graph":1,
     }
     resps={
         "exit":[],
@@ -23,6 +31,7 @@ class intResp():
         "solve":["Enter a math problem..."],
         "question":["Enter a document...", "Ask me a question about the document..."],
         "invalid":["I dont understand"],
+        "graph":["Enter an equation"]
     }
     actionX=""
     nlp = spacy.load("en_core_web_sm")
@@ -81,6 +90,8 @@ def process(fff, input):
             intResp.actionX = "solve"
         elif input_lower == "question":
             intResp.actionX = "question"
+        elif input_lower == "graph":
+            intResp.actionX = "graph"
         else:
             if intResp.actionX.lower() == "":
                 intResp.actionX = "invalid"
@@ -115,21 +126,48 @@ def gr(inpArr):
         return f"The keywords in the text are: {', '.join(keywords)}"
         
     elif "summarize" in inpArr[0].lower():
-        intResp.action="summarize"
+        intResp.action = "summarize"
         text = inpArr[2]
         print(f"Summarizing: {text}")
         summary = summarize_text(text)
         return f"Here's a brief summary: {summary}"
         
     elif "solve" in inpArr[0].lower():
-        intResp.action="solve"
+        intResp.action = "solve"
         print(f"InpArr: {inpArr[1]}")
         equation_str = inpArr[2]
         solution = solve_equation(equation_str)
         return f"The solution to the equation is: {solution}"
+    
+    elif "graph" in inpArr[0].lower():
+        intResp.action = "graph"
+        print(f"InpArr: {inpArr[2]}")
+        equation_str = inpArr[2]
         
+        try:
+            x = np.linspace(-2, 2, 100)
+            y = eval(equation_str.replace('y=', ''))
+            
+            # Create a figure and axes
+            fig, ax = plt.subplots(figsize=(10, 5))
+            
+            # Create the plot
+            ax.plot(x, y)
+            
+            # Save the plot to a BytesIO buffer
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            buf.seek(0)
+            string = base64.b64encode(buf.read()).decode()  # Decode the base64 bytes to a string
+            
+            uri = 'data:image/png;base64,' + quote(string)  # Use urllib.parse.quote to encode the string
+            html = f'<img class=\"graph\" src="{uri}"/>'
+            return html
+        except Exception as e:
+            return f"Error: {e}"
+    
     elif "question" in inpArr[0].lower():
-        intResp.action="question"
+        intResp.action = "question"
         document = inpArr[2]
         question = inpArr[3]
         answer = answer_question(document, question)
@@ -138,5 +176,6 @@ def gr(inpArr):
     
     else:
         return "I'm sorry. I can't understand your request."
+        intResp.inputsCompleted=0
         
 
