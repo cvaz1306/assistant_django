@@ -19,10 +19,9 @@ def mess(request):
         message = models.message(message=postData.get('message',None))
         message.save()
         print(f"Created Message: {message.message}")
-        try:
-            response=process("fff",input=postData.get('message',None))
-        except Exception as e:
-            response=f"Error generating response. {e}"
+        #try:
+        response=process("fff",input=postData.get('message',None))
+        #except Exception as e:
         serverResponse=models.message(message=response, isServer=True)
         serverResponse.save()
         all_messages = {'messages':
