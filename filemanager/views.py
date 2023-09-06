@@ -9,7 +9,15 @@ import urllib.parse
 from django.views.decorators.csrf import csrf_exempt
 import numpy as np
 from . import models
-
+import docx
+class docxprocessor():
+    def processDocx(docx_file):
+        doc = docx.Document(docx_file)
+        # Extract the text from the document
+        document_text = ""
+        for para in doc.paragraphs:
+            document_text += para.text + "\n    "
+        return document_text
 @csrf_exempt
 def filemanager(request):
     a=""
@@ -36,5 +44,28 @@ def getFile(request):
                 response = HttpResponse(file.read(), content_type='application/octet-stream')
                 response['Content-Disposition'] = f'attachment; filename="{file_obj.file.name}"'
                 return response
+    except:
+        return HttpResponse("Error", status=500)
+def readFile(id):
+    #reqData=json.loads(request.body)
+    reqId=id
+    file_obj = get_object_or_404(models.File, id=reqId)
+
+    try:
+        # Check if the file exists
+        if os.path.exists(file_obj.file.path):
+            with open(file_obj.file.path, 'rb') as file:
+                if(file_obj.file.path.endswith('.docx')):
+                    print('File is a document')
+                    filecontent=docxprocessor.processDocx(file)
+                    print(f"File Content: {filecontent}")
+                    
+                response = HttpResponse(file.read(), content_type='application/octet-stream')
+                response['Content-Disposition'] = f'attachment; filename="{file_obj.file.name}"'
+                return filecontent
     except: 
-        return HttpResponse(status=404)
+        return "Error"
+    
+def deleteAll(request):
+        models.File.objects.all().delete()
+        return JsonResponse({"success":True})
