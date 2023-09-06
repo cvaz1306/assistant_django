@@ -7,22 +7,40 @@ from sympy import Symbol, symbols, Eq, solve, sympify
 import sympy
 from transformers import pipeline
 import urllib3
+import os
+from filemanager.models import *
 from .models import *
 from collections import Counter
 from urllib.parse import quote
 from numpy import *
 import json
+import docx
+from filemanager.views import readFile
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+class docxprocessor():
+    def processDocx(docx_file):
+        doc = docx.Document(docx_file)
+        #
+        document_text = ""
+        for para in doc.paragraphs:
+            document_text += para.text + "\n    "
+        return document_text
 class intResp():
     # Load spaCy model
+    file_obj=File()
     user_commands = []
     inputsRequired=0
     inputsCompleted=0
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+    model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
     actionIns={
         "exit":0,
         "keywords":1,
         "summarize":1,
         "solve":1,
         "question":2,
+        "question_about":1,
         "invalid":0,
         "graph":1,
     }
@@ -32,6 +50,7 @@ class intResp():
         "summarize":["Enter the document..."],
         "solve":["Enter a math problem..."],
         "question":["Enter a document...", "Ask me a question about the document..."],
+        "question_about":["Ask me a question about the document..."],
         "invalid":["I dont understand"],
         "graph":["Enter an equation"]
     }
@@ -77,21 +96,47 @@ def process(fff, input):
     
     resp=""
     print(f"Ins Completed: {intResp.inputsCompleted}; ")
-    if(intResp.inputsCompleted==0):
+    if intResp.inputsCompleted == 0:
         intResp.user_commands.append(input)
-        input_lower = input.lower()  
-        if input_lower == "exit":
+        input_lower = input.lower()
+
+        if "exit" in input_lower:
             intResp.actionX = "exit"
-        elif input_lower == "keywords":
+        elif "keywords" in input_lower:
             intResp.actionX = "keywords"
-        elif input_lower == "summarize":
+        elif "summarize" in input_lower:
             intResp.actionX = "summarize"
-        elif input_lower == "solve":
+        elif "solve" in input_lower:
             intResp.actionX = "solve"
-        elif input_lower == "question":
+        elif "question" in input_lower:
             intResp.actionX = "question"
-        elif input_lower == "graph":
+
+            # Check if there's a document filename specified in the user's message
+            document_name = None
+            if "question about" in input_lower:
+                document_name = input_lower.split("question about", 1)[1].strip()
+                print(intResp.file_obj.file)
+            print(f"Path does {'not ' if not os.path.exists(intResp.file_obj.file.path) else ''}exists")
+            # If a document name is found, you can search for the matching File object
+            if document_name:
+                
+                try:
+                    # Query the database to find the File object with a matching name
+                    intResp.file_ob = File.objects.all().filter(name=document_name).first()
+
+                    # Now you have the File object, and you can handle it accordingly
+                    print(f"User wants to ask a question about {document_name}")
+                    print(f"File object: {intResp.file_obj}")
+                    
+                    intResp.actionX = "question_about"
+                    # You can further process or use the file_object here
+                except File.DoesNotExist:
+                    # Handle the case when the specified file does not exist in the database
+                    print(f"File '{document_name}' not found in the database.")
+                
+        elif "graph" in input_lower:
             intResp.actionX = "graph"
+
         else:
             if intResp.actionX.lower() == "":
                 intResp.actionX = "invalid"
@@ -169,19 +214,38 @@ def gr(inpArr):
             return html
         except Exception as e:
             return f"Error: {e}"
-    
-    elif "question" in inpArr[0].lower():
+
+    elif "question_about"==intResp.actionX:
         intResp.action = "question"
+        responseX=""
+        responseX=docxprocessor.processDocx(intResp.file_obj.id)
+        document = responseX
+        question = inpArr[2]
+        answer = answer_question(document, question)
+        print(f"answer: {answer}")
+        return f"The answer to your question is: {answer}"
+
+
+    elif "question" in inpArr[0].lower():
+        intResp.action = "question_about"
         document = inpArr[2]
         question = inpArr[3]
         answer = answer_question(document, question)
         print(f"answer: {answer}")
         return f"The answer to your question is: {answer}"
     
-    else:
-        print(json.dumps(inpArr))
-        intResp.inputsCompleted=0
-        return "I'm sorry. I can't understand your request."
-        
-        
 
+    
+    else:
+
+
+        # Let's chat for 5 lines
+        
+        # encode the new user input, add the eos_token and return a tensor in Pytorch
+        new_user_input_ids = intResp.tokenizer.encode(inpArr[0] + intResp.tokenizer.eos_token, return_tensors='pt')
+        # append the new user input tokens to the chat history
+        bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if 0 > 0 else new_user_input_ids
+        # generated a response while limiting the total chat history to 1000 tokens, 
+        chat_history_ids = intResp.model.generate(bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
+        # pretty print last ouput tokens from bot
+        return ("{}".format(intResp.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
