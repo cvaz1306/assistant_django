@@ -122,11 +122,7 @@ def process(fff, input):
             document_name = None
             if "question about" in input_lower:
                 document_name = input_lower.split("question about", 1)[1].strip()
-                print(intResp.file_obj.file)
-            print(f"Path does {'not ' if not os.path.exists(intResp.file_obj.file.path) else ''}exists")
-            # If a document name is found, you can search for the matching File object
-            if document_name:
-                
+                print(f"File: {intResp.file_obj.file}")
                 try:
                     # Query the database to find the File object with a matching name
                     intResp.file_ob = File.objects.all().filter(name=document_name).first()
@@ -244,7 +240,6 @@ def gr(inpArr):
 
     
     else:
-        conversation_history = []
         print(f"Input array: {str(inpArr)}")
 
         # Let's chat for 5 lines
@@ -256,10 +251,6 @@ def gr(inpArr):
         # generated a response while limiting the total chat history to 1000 tokens, 
         intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
         # pretty print last ouput tokens from bot
-        chat_history_text = intResp.tokenizer.decode(intResp.chat_history_ids[0], skip_special_tokens=True)
-        conversation_history.append(chat_history_text)
-        for i in range(0, len(conversation_history), 2):
-            print("User:   ", conversation_history[i])
-            print("DialoGPT:", conversation_history[i + 1])
-        print(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True))
+
+        
         return ("{}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
