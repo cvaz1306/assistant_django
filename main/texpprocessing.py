@@ -132,7 +132,7 @@ def process(fff, input):
                     print(f"File object: {intResp.file_obj}")
                     
                     intResp.actionX = "question_about"
-                    # You can further process or use the file_object here
+                    # You can further process or use the file_object her
                 except File.DoesNotExist:
                     # Handle the case when the specified file does not exist in the database
                     print(f"File '{document_name}' not found in the database.")
@@ -252,5 +252,5 @@ def gr(inpArr):
         intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
         # pretty print last ouput tokens from bot
 
-        
+        print("Response: {}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
         return ("{}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
