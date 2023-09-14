@@ -1,0 +1,64 @@
+/* File Manager Container */
+
+.file-manager-container {
+    margin-left: 260px;
+    /* Adjust as needed */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Pushes the text input and button to the bottom */
+}
+
+.grid-list {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-auto-rows: auto;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+
+/* Styles for the cards in the file manager */
+
+.card {
+    background-color: #fff;
+    color: #009bff;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+    text-decoration: none;
+    width: 137px;
+    height: 137px;
+}
+
+.card:hover {
+    background-color: #f0f0f0;
+}
+
+.upload-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007BFF;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 24px;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+
+/* Hidden file input element */
+
+#file-input {
+    display: none;
+}
+
+
+/* Additional styles for file manager as needed */

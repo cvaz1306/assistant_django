@@ -4,5 +4,8 @@ urlpatterns=[
     path('', view=views.filemanager),
     path('upload', views.upload_file, name='upload_file'),
     path('files', views.files),
-    path('get', views.getFile)
+    path('get', views.getFile),
+    path('deleteall', views.deleteAll),
+    path('read', views.read),
+    
 ]
