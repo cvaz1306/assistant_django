@@ -59,11 +59,13 @@ def readFile(id):
                     print('File is a document')
                     filecontent=docxprocessor.processDocx(file)
                     print(f"File Content: {filecontent}")
+                    
+                response = HttpResponse(file.read(), content_type='application/octet-stream')
+                response['Content-Disposition'] = f'attachment; filename="{file_obj.file.name}"'
                 return filecontent
     except: 
         return "Error"
-def read(request):
-        return HttpResponse(readFile(json.loads(request.GET.get('id',0))))
+    
 def deleteAll(request):
         models.File.objects.all().delete()
         return JsonResponse({"success":True})
