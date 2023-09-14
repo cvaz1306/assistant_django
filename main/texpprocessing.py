@@ -56,6 +56,13 @@ class intResp():
     }
     actionX=""
     nlp = spacy.load("en_core_web_sm")
+    new_user_input_ids = tokenizer.encode("" + tokenizer.eos_token, return_tensors='pt')
+    # append the new user input tokens to the chat history
+    bot_input_ids = torch.cat([tokenizer.encode("" + tokenizer.eos_token, return_tensors='pt'), new_user_input_ids], dim=-1) if 1 > 0 else new_user_input_ids
+    # generated a response while limiting the total chat history to 1000 tokens, 
+    chat_history_ids = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+    # pretty print last ouput tokens from bot
+    
 def summarize_text(text, num_sentences=3):
     # Parse the input text with spaCy
     doc = intResp.nlp(text)
@@ -115,11 +122,7 @@ def process(fff, input):
             document_name = None
             if "question about" in input_lower:
                 document_name = input_lower.split("question about", 1)[1].strip()
-                print(intResp.file_obj.file)
-            print(f"Path does {'not ' if not os.path.exists(intResp.file_obj.file.path) else ''}exists")
-            # If a document name is found, you can search for the matching File object
-            if document_name:
-                
+                print(f"File: {intResp.file_obj.file}")
                 try:
                     # Query the database to find the File object with a matching name
                     intResp.file_ob = File.objects.all().filter(name=document_name).first()
@@ -129,7 +132,7 @@ def process(fff, input):
                     print(f"File object: {intResp.file_obj}")
                     
                     intResp.actionX = "question_about"
-                    # You can further process or use the file_object here
+                    # You can further process or use the file_object her
                 except File.DoesNotExist:
                     # Handle the case when the specified file does not exist in the database
                     print(f"File '{document_name}' not found in the database.")
@@ -144,13 +147,13 @@ def process(fff, input):
                 intResp.actionX = ""
 
         print(f"Action X: '{intResp.actionX}'")
-        intResp.inputsRequired=intResp.actionIns.get(intResp.actionX)
-        resp = intResp.resps.get(intResp.actionX)[intResp.inputsCompleted]
+        intResp.inputsRequired=intResp.actionIns.get(intResp.actionX, 0)
+        resp = intResp.resps.get(intResp.actionX, ["Hello"])[intResp.inputsCompleted]
     if(intResp.inputsCompleted <= intResp.inputsRequired and not intResp.user_commands==0):
         intResp.user_commands.append(input)
         print(f"Input: {input.lower()}; ActionX: {intResp.actionX}; Inputs completed: {intResp.inputsCompleted}")
         if(not intResp.inputsCompleted==intResp.inputsRequired):
-            resp = intResp.resps.get(intResp.actionX)[intResp.inputsCompleted]
+            resp = intResp.resps.get(intResp.actionX, ["Hello"])[intResp.inputsCompleted]
         
     intResp.inputsCompleted=intResp.inputsCompleted+1
     
@@ -216,7 +219,7 @@ def gr(inpArr):
             return f"Error: {e}"
 
     elif "question_about"==intResp.actionX:
-        intResp.action = "question"
+        intResp.action = "question_about"
         responseX=""
         responseX=docxprocessor.processDocx(intResp.file_obj.id)
         document = responseX
@@ -237,15 +240,17 @@ def gr(inpArr):
 
     
     else:
-
+        print(f"Input array: {str(inpArr)}")
 
         # Let's chat for 5 lines
         
         # encode the new user input, add the eos_token and return a tensor in Pytorch
         new_user_input_ids = intResp.tokenizer.encode(inpArr[0] + intResp.tokenizer.eos_token, return_tensors='pt')
         # append the new user input tokens to the chat history
-        bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if 0 > 0 else new_user_input_ids
+        intResp.bot_input_ids = torch.cat([intResp.chat_history_ids, new_user_input_ids], dim=-1) if 1 > 0 else intResp.new_user_input_ids
         # generated a response while limiting the total chat history to 1000 tokens, 
-        chat_history_ids = intResp.model.generate(bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
+        intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
         # pretty print last ouput tokens from bot
-        return ("{}".format(intResp.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+
+        print("Response: {}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+        return ("{}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
