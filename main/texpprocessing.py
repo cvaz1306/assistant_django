@@ -86,7 +86,10 @@ def search_question(question):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     search_results = soup.find_all('div', class_='BNeawe')
-    return search_results[0].get_text()
+    srz=""
+    for resu in search_results:
+        srz=srz+"\n"+resu.get_text()
+    return srz#search_results[0].get_text()
 
 def summarize_text(text):
     tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
