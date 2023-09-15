@@ -1,3 +1,9 @@
+# Prerequisites
+* Python
+* git
+* Internet Access
+
+Run all the code in the given order, in one session, to maintain the context in ```cmd```
 # Django Assistant
 This project is an asssistant that runs on the django framework.
 There is no security built in to this project. This means that if this project is available to the World Wide Web or another device, it may put your device at serious risk.
@@ -5,11 +11,7 @@ There is no security built in to this project. This means that if this project i
 ## Create and Activate Python Virtual Environment
 Run ```py -m venv <venv name>```.
 Then run ```<venv name>/Scripts/activate```.
-## Install required Python packages
-Then ```pip install django``` to install django.
-## Create new Django project
-Run ```py -m django startproject Assistant```.
-Now move into ```Assistant``` directory: ```cd Assistant```
+## Clone the Django project
 Clone the repository. ```git clone https://github.com/cvaz1306/assistant_django.git```
 Then ```cd assistant_django``` to move into the cloned directory. Install the required packages: ```pip install -r requirements.txt```.
 ## Run the server
