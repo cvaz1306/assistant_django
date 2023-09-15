@@ -63,6 +63,8 @@
             margin: 10px 0;
             margin-right: 1004px;
             min-height: 46px;
+            position: relative;
+            left: 33px;
             overflow: hidden;
         }
         

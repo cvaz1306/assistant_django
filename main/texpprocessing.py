@@ -283,7 +283,7 @@ def gr(inpArr):
         return res
     else:
         print(f"Input array: {str(inpArr)}")
-        new_user_input_ids = intResp.tokenizer.encode(inpArr[0] + intResp.tokenizer.eos_token, return_tensors='pt')
+        new_user_input_ids = intResp.tokenizer.encode(intResp.tokenizer.eos_token + inpArr[0], return_tensors='pt')
         intResp.bot_input_ids = torch.cat([intResp.chat_history_ids, new_user_input_ids], dim=-1) if 1 > 0 else intResp.new_user_input_ids
         intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
         print("Response: {}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
