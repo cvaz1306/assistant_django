@@ -6,6 +6,5 @@ urlpatterns=[
     path('files', views.files),
     path('get', views.getFile),
     path('deleteall', views.deleteAll),
-    path('read', views.read),
     
 ]

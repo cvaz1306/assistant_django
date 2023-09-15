@@ -4,6 +4,8 @@ from .texpprocessing import *
 from . import models
 from django.views.decorators.csrf import csrf_exempt
 import json
+import traceback
+
 def contact(request):
     return render(request, "main/contact.html")
 def main(request):
@@ -22,8 +24,8 @@ def mess(request):
         try:
             response=process("fff",input=postData.get('message',None))
         except Exception as e:
-            print(f"Error generating response: {e}")
-            response=f"Error generating response: {e}"
+            print(f"Error generating response: {traceback.format_exc()}")
+            response=f"Error generating response: {traceback.format_exc()}"
         serverResponse=models.message(message=response, isServer=True)
         serverResponse.save()
         all_messages = {'messages':

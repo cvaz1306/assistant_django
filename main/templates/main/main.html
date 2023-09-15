@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/css/main.css">
+    <link rel="stylesheet" href="/static/css/main.css">
     <style>
         .generatingMessage {
             text-align: center;
@@ -59,10 +59,10 @@
         <div class="user-messages" id="chat-messages">
             <!-- Existing and dynamically added chat messages will go here -->
             {% for message in messages %} {% if message.isServer %}
-            <div class="server-message">{{ message.message }}</div>
+            <div class="server-message">{{ message.message|safe }}</div>
 
             {% else %}
-            <div class="user-message">{{ message.message }}</div>
+            <div class="user-message">{{ message.message|safe }}</div>
             {% endif %} {% endfor %}
 
         </div>

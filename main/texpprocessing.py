@@ -1,12 +1,12 @@
 import base64
 import io
+import traceback
 from matplotlib import pyplot as plt
 import numpy as np
 import spacy
 from sympy import Symbol, symbols, Eq, solve, sympify
 import sympy
 from transformers import pipeline
-import urllib3
 import os
 from filemanager.models import *
 import os
@@ -15,11 +15,14 @@ from .models import *
 from collections import Counter
 from urllib.parse import quote
 from numpy import *
-import json
 import docx
 from filemanager.views import readFile
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import requests
+from bs4 import BeautifulSoup
+from transformers import T5ForConditionalGeneration, T5Tokenizer
+
 class docxprocessor():
     def processDocx(docx_file):
         doc = docx.Document(docx_file)
@@ -28,29 +31,20 @@ class docxprocessor():
         for para in doc.paragraphs:
             document_text += para.text + "\n    "
         return document_text
-import docx
 from filemanager.views import readFile
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
-class docxprocessor():
-    def processDocx(docx_file):
-        doc = docx.Document(docx_file)
-        #
-        document_text = ""
-        for para in doc.paragraphs:
-            document_text += para.text + "\n    "
-        return document_text
+
 class intResp():
     # Load spaCy model
-    file_obj=File()
+    sq=""
     file_obj=File()
     user_commands = []
     inputsRequired=0
     inputsCompleted=0
     tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
     model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
-    model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+    modelX = T5ForConditionalGeneration.from_pretrained("google/flan-t5-large")
     actionIns={
         "exit":0,
         "keywords":1,
@@ -61,6 +55,7 @@ class intResp():
         "question_about":1,
         "invalid":0,
         "graph":1,
+        "search":0,
     }
     resps={
         "exit":[],
@@ -71,7 +66,8 @@ class intResp():
         "question_about":["Ask me a question about the document..."],
         "question_about":["Ask me a question about the document..."],
         "invalid":["I dont understand"],
-        "graph":["Enter an equation"]
+        "graph":["Enter an equation"],
+        "search":[""],
     }
     actionX=""
     nlp = spacy.load("en_core_web_sm")
@@ -81,6 +77,24 @@ class intResp():
     # generated a response while limiting the total chat history to 1000 tokens, 
     chat_history_ids = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
     # pretty print last ouput tokens from bot
+
+
+
+    
+def search_question(question):
+    url = f"https://www.google.com/search?q={question}"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    search_results = soup.find_all('div', class_='BNeawe')
+    return search_results[0].get_text()
+
+def summarize_text(text):
+    tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
+    inputs = tokenizerX.encode("summarize: " + text, return_tensors="pt", max_length=512, truncation=True)
+    outputs = modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
+    summary = tokenizerX.decode(outputs[0])
+    
+    return summary
 def readDocx(reqId):
     file_obj = get_object_or_404(models.File, id=reqId)
 
@@ -95,12 +109,7 @@ def readDocx(reqId):
                 return filecontent
     except Exception as e:
         print(f"Error: {e}")
-    new_user_input_ids = tokenizer.encode("" + tokenizer.eos_token, return_tensors='pt')
-    # append the new user input tokens to the chat history
-    bot_input_ids = torch.cat([tokenizer.encode("" + tokenizer.eos_token, return_tensors='pt'), new_user_input_ids], dim=-1) if 1 > 0 else new_user_input_ids
-    # generated a response while limiting the total chat history to 1000 tokens, 
-    chat_history_ids = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
-    # pretty print last ouput tokens from bot
+        return "Error"
     
 def summarize_text(text, num_sentences=3):
     # Parse the input text with spaCy
@@ -143,25 +152,17 @@ def process(fff, input):
     resp=""
     print(f"Ins Completed: {intResp.inputsCompleted}; ")
     if intResp.inputsCompleted == 0:
-    if intResp.inputsCompleted == 0:
         intResp.user_commands.append(input)
-        input_lower = input.lower()
-
-        if "exit" in input_lower:
         input_lower = input.lower()
 
         if "exit" in input_lower:
             intResp.actionX = "exit"
         elif "keywords" in input_lower:
-        elif "keywords" in input_lower:
             intResp.actionX = "keywords"
-        elif "summarize" in input_lower:
         elif "summarize" in input_lower:
             intResp.actionX = "summarize"
         elif "solve" in input_lower:
-        elif "solve" in input_lower:
             intResp.actionX = "solve"
-        elif "question" in input_lower:
         elif "question" in input_lower:
             intResp.actionX = "question"
 
@@ -183,31 +184,13 @@ def process(fff, input):
                 except File.DoesNotExist:
                     # Handle the case when the specified file does not exist in the database
                     print(f"File '{document_name}' not found in the database.")
-                
-        elif "graph" in input_lower:
-
-            # Check if there's a document filename specified in the user's message
-            document_name = None
-            if "question about" in input_lower:
-                document_name = input_lower.split("question about", 1)[1].strip()
-                print(f"File: {intResp.file_obj.file}")
-                try:
-                    # Query the database to find the File object with a matching name
-                    intResp.file_ob = File.objects.all().filter(name=document_name).first()
-
-                    # Now you have the File object, and you can handle it accordingly
-                    print(f"User wants to ask a question about {document_name}")
-                    print(f"File object: {intResp.file_obj}")
-                    
-                    intResp.actionX = "question_about"
-                    # You can further process or use the file_object her
-                except File.DoesNotExist:
-                    # Handle the case when the specified file does not exist in the database
-                    print(f"File '{document_name}' not found in the database.")
-                
         elif "graph" in input_lower:
             intResp.actionX = "graph"
-
+        elif "search" in input_lower:
+            intResp.actionX="search"
+            intResp.sq = input_lower.split("search", 1)[1].strip()
+            print(f"Search Query: {intResp.sq}")
+            
         else:
             if intResp.actionX.lower() == "":
                 intResp.actionX = "invalid"
@@ -215,8 +198,8 @@ def process(fff, input):
                 intResp.actionX = ""
 
         print(f"Action X: '{intResp.actionX}'")
-        intResp.inputsRequired=intResp.actionIns.get(intResp.actionX, 0, 0)
-        resp = intResp.resps.get(intResp.actionX, ["Hello"], ["Hello"])[intResp.inputsCompleted]
+        intResp.inputsRequired=intResp.actionIns.get(intResp.actionX, 0)
+        resp = intResp.resps.get(intResp.actionX, ["Hello"])[intResp.inputsCompleted]
     if(intResp.inputsCompleted <= intResp.inputsRequired and not intResp.user_commands==0):
         intResp.user_commands.append(input)
         print(f"Input: {input.lower()}; ActionX: {intResp.actionX}; Inputs completed: {intResp.inputsCompleted}")
@@ -247,45 +230,37 @@ def gr(inpArr):
         print(f"Summarizing: {text}")
         summary = summarize_text(text)
         return f"Here's a brief summary: {summary}"
-        
     elif "solve" in inpArr[0].lower():
         intResp.action = "solve"
         print(f"InpArr: {inpArr[1]}")
         equation_str = inpArr[2]
         solution = solve_equation(equation_str)
         return f"The solution to the equation is: {solution}"
-    
     elif "graph" in inpArr[0].lower():
         intResp.action = "graph"
-        print(f"InpArr: {inpArr[2]}")
+        print(f"InpArr: {inpArr}")
         equation_str = inpArr[2]
         sympy_eq = sympify("Eq(" + equation_str.replace("=", ",") + ")")
         solution=list(solve(sympy_eq))[0]
-        
         sx=str(list(sympy.solve(sympy_eq, sympy.Symbol('y')))[0])
         print(f"Solution: {sx}")
         try:
             x = np.linspace(-20, 20, 1000)
             y = eval(f'{sx}')
-            
             # Create a figure and axes
             fig, ax = plt.subplots(figsize=(10, 5))
-            
             # Create the plot
             ax.plot(x, y)
-            
             # Save the plot to a BytesIO buffer
             buf = io.BytesIO()
             fig.savefig(buf, format='png')
             buf.seek(0)
-            string = base64.b64encode(buf.read()).decode()  # Decode the base64 bytes to a string
-            
+            string = base64.b64encode(buf.read()).decode()
             uri = 'data:image/png;base64,' + quote(string)  # Use urllib.parse.quote to encode the string
             html = """<img class='graph' src='"""+uri+"""' />"""
             return html
         except Exception as e:
             return f"Error: {e}"
-
     elif "question_about"==intResp.actionX:
         intResp.action = "question_about"
         responseX=""
@@ -295,8 +270,6 @@ def gr(inpArr):
         answer = answer_question(document, question)
         print(f"answer: {answer}")
         return f"The answer to your question is: {answer}"
-
-
     elif "question" in inpArr[0].lower():
         intResp.action = "question_about"
         document = inpArr[2]
@@ -304,37 +277,14 @@ def gr(inpArr):
         answer = answer_question(document, question)
         print(f"answer: {answer}")
         return f"The answer to your question is: {answer}"
-    
-
-    
-
-    
+    elif "search" in inpArr[0].lower():
+        res=search_question(intResp.sq)
+        print(res)
+        return res
     else:
         print(f"Input array: {str(inpArr)}")
-
-        # Let's chat for 5 lines
-        
-        # encode the new user input, add the eos_token and return a tensor in Pytorch
         new_user_input_ids = intResp.tokenizer.encode(inpArr[0] + intResp.tokenizer.eos_token, return_tensors='pt')
-        # append the new user input tokens to the chat history
         intResp.bot_input_ids = torch.cat([intResp.chat_history_ids, new_user_input_ids], dim=-1) if 1 > 0 else intResp.new_user_input_ids
-        # generated a response while limiting the total chat history to 1000 tokens, 
         intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
-        # pretty print last ouput tokens from bot
-
-        print("Response: {}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
-        return ("{}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
-        print(f"Input array: {str(inpArr)}")
-
-        # Let's chat for 5 lines
-        
-        # encode the new user input, add the eos_token and return a tensor in Pytorch
-        new_user_input_ids = intResp.tokenizer.encode(inpArr[0] + intResp.tokenizer.eos_token, return_tensors='pt')
-        # append the new user input tokens to the chat history
-        intResp.bot_input_ids = torch.cat([intResp.chat_history_ids, new_user_input_ids], dim=-1) if 1 > 0 else intResp.new_user_input_ids
-        # generated a response while limiting the total chat history to 1000 tokens, 
-        intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
-        # pretty print last ouput tokens from bot
-
         print("Response: {}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
         return ("{}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
