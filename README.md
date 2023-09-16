@@ -6,7 +6,7 @@
 Run all the code in the given order, in one session, to maintain the context in ```cmd```
 # Django Assistant
 This project is an asssistant that runs on the django framework.
-There is no security built in to this project. This means that if this project is available to the World Wide Web or another device, it may put your device at serious risk.
+:warning: **There is no security built in to this project. This means that if this project is available to the World Wide Web or another device, it may put your device at serious risk. Please run this on your subnet, and nowhere else.**
 # Windows Setup
 ## Create and Activate Python Virtual Environment
 Run ```py -m venv <venv name>```.
