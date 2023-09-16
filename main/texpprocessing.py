@@ -91,10 +91,10 @@ def search_question(question):
         srz=srz+"\n"+resu.get_text()
     return srz#search_results[0].get_text()
 
-def summarize_text(text):
+def summarize_textX(text):
     tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
     inputs = tokenizerX.encode("summarize: " + text, return_tensors="pt", max_length=512, truncation=True)
-    outputs = modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
+    outputs = intResp.modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
     summary = tokenizerX.decode(outputs[0])
     
     return summary
@@ -281,13 +281,12 @@ def gr(inpArr):
         print(f"answer: {answer}")
         return f"The answer to your question is: {answer}"
     elif "search" in inpArr[0].lower():
-        res=search_question(intResp.sq)
+        res=summarize_textX(search_question(intResp.sq))
         print(res)
         return res
     else:
-        print(f"Input array: {str(inpArr)}")
-        new_user_input_ids = intResp.tokenizer.encode(intResp.tokenizer.eos_token + inpArr[0], return_tensors='pt')
-        intResp.bot_input_ids = torch.cat([intResp.chat_history_ids, new_user_input_ids], dim=-1) if 1 > 0 else intResp.new_user_input_ids
-        intResp.chat_history_ids = intResp.model.generate(intResp.bot_input_ids, max_length=1000, pad_token_id=intResp.tokenizer.eos_token_id)
-        print("Response: {}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
-        return ("{}".format(intResp.tokenizer.decode(intResp.chat_history_ids[:, intResp.bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+        tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
+        inputs = tokenizerX.encode(inpArr[0], return_tensors="pt", max_length=512, truncation=True)
+        outputs = intResp.modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
+        op = tokenizerX.decode(outputs[0])
+        return op
