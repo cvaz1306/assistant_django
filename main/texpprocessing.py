@@ -286,7 +286,7 @@ def gr(inpArr):
         return res
     else:
         tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
-        inputs = tokenizerX.encode(inpArr[0], return_tensors="pt", max_length=512, truncation=True)
+        inputs = tokenizerX.encode(f"{inpArr[0]}", return_tensors="pt", max_length=512, truncation=True)
         outputs = intResp.modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
         op = tokenizerX.decode(outputs[0])
         return op
