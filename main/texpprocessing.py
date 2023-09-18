@@ -43,6 +43,7 @@ class intResp():
     inputsRequired=0
     inputsCompleted=0
     tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+    tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
     model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
     modelX = T5ForConditionalGeneration.from_pretrained("google/flan-t5-large")
     actionIns={
@@ -93,7 +94,7 @@ def search_question(question):
 
 def summarize_textX(text):
     tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
-    inputs = tokenizerX.encode("summarize: " + text, return_tensors="pt", max_length=512, truncation=True)
+    inputs = tokenizerX.encode("summarize, excluding any links, urls, or questions. Please use normal english and write authoritatively: " + text, return_tensors="pt", max_length=512, truncation=True)
     outputs = intResp.modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
     summary = tokenizerX.decode(outputs[0])
     
@@ -285,8 +286,8 @@ def gr(inpArr):
         print(res)
         return res
     else:
-        tokenizerX = T5Tokenizer.from_pretrained("google/flan-t5-large")
-        inputs = tokenizerX.encode(f"{inpArr[0]}", return_tensors="pt", max_length=512, truncation=True)
-        outputs = intResp.modelX.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
-        op = tokenizerX.decode(outputs[0])
+        
+        inputs = intResp.tokenizerX.encode(f"Assume you are a helpful AI assistant that uses the transformers library written by HuggingFace with a model trained BY google on a large amount of data. You are based on the django web framework. You can do anything that requires only text input and/or output. Follow the following instructions meticuluously: Answer with good grammar while remaining honest, age appropriate, and useful for any user: {inpArr[0]}", return_tensors="pt", max_length=512, truncation=True)
+        outputs = intResp.modelX.generate(inputs, max_length=150, min_length=20, length_penalty=2.0, num_beams=4, early_stopping=True)
+        op = intResp.tokenizerX.decode(outputs[0])
         return op
