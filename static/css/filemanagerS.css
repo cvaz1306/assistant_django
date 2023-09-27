@@ -17,6 +17,8 @@
     gap: 10px;
     list-style: none;
     padding: 0;
+    position: relative;
+    left: 55px;
 }
 
 
